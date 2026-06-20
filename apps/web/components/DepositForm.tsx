@@ -2,9 +2,14 @@
 
 import { useState } from "react";
 import { useWallet } from "@/context/WalletContext";
-import { invokeContract } from "@/lib/soroban";
+import { MarketContractClient } from "@/lib/generated/market-contract";
+import { MARKET_CONTRACT_ID, SOROBAN_RPC_URL, NETWORK_PASSPHRASE } from "@/lib/soroban";
 
-export function DepositForm() {
+interface DepositFormProps {
+  marketId: number;
+}
+
+export function DepositForm({ marketId }: DepositFormProps) {
   const { address } = useWallet();
   const [amount, setAmount] = useState("");
   const [isLoading, setIsLoading] = useState(false);
@@ -17,11 +22,36 @@ export function DepositForm() {
       setError("Connect your Freighter wallet first.");
       return;
     }
+    if (!MARKET_CONTRACT_ID) {
+      setError("NEXT_PUBLIC_MARKET_CONTRACT_ID is not set.");
+      return;
+    }
     setIsLoading(true);
     setError(null);
     setTxHash(null);
     try {
-      const { hash } = await invokeContract("deposit", { amount, address });
+      const client = new MarketContractClient({
+        contractId: MARKET_CONTRACT_ID,
+        networkPassphrase: NETWORK_PASSPHRASE,
+        rpcUrl: SOROBAN_RPC_URL,
+      });
+      const amountInStroops = BigInt(Math.round(parseFloat(amount) * 1e7));
+      const tx = await client.deposit_collateral({
+        user: address,
+        market_id: marketId,
+        amount: amountInStroops,
+      });
+      const { signTransaction } = await import("@stellar/freighter-api");
+      const { hash } = await tx.signAndSend({
+        signTransaction: async (xdr) => {
+          const result = await signTransaction(xdr, {
+            networkPassphrase: NETWORK_PASSPHRASE,
+            address,
+          });
+          if (result.error) throw new Error(result.error.message);
+          return { signedTxXdr: result.signedTxXdr };
+        },
+      });
       setTxHash(hash);
       setAmount("");
     } catch (err) {

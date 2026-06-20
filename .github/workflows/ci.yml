@@ -141,6 +141,16 @@ jobs:
       - name: Install dependencies
         run: pnpm install
 
+      - name: Install Stellar CLI
+        run: cargo install --locked stellar-cli --features opt
+
+      - name: Generate TypeScript bindings
+        run: pnpm build:bindings
+        env:
+          NEXT_PUBLIC_MARKET_CONTRACT_ID: ${{ secrets.NEXT_PUBLIC_MARKET_CONTRACT_ID }}
+          NEXT_PUBLIC_SOROBAN_RPC_URL: ${{ vars.NEXT_PUBLIC_SOROBAN_RPC_URL }}
+          NEXT_PUBLIC_NETWORK_PASSPHRASE: ${{ vars.NEXT_PUBLIC_NETWORK_PASSPHRASE }}
+
       - name: Lint web app
         run: pnpm --filter web lint
 

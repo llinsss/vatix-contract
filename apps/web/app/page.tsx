@@ -40,7 +40,7 @@ export default function HomePage() {
       <div className="mt-10">
         <h2 className="mb-4 text-lg font-medium">Your positions</h2>
         <ErrorBoundary>
-          <PositionPanel />
+          <PositionPanel marketId={1} />
         </ErrorBoundary>
       </div>
     </div>

@@ -5,8 +5,14 @@
  * All config comes from Next.js public env vars.
  */
 
-export const CONTRACT_ID =
-  process.env.NEXT_PUBLIC_CONTRACT_ID ?? "";
+// NEXT_PUBLIC_MARKET_CONTRACT_ID is the canonical env var; NEXT_PUBLIC_CONTRACT_ID kept for backwards compat.
+export const MARKET_CONTRACT_ID =
+  process.env.NEXT_PUBLIC_MARKET_CONTRACT_ID ??
+  process.env.NEXT_PUBLIC_CONTRACT_ID ??
+  "";
+
+/** @deprecated Use MARKET_CONTRACT_ID */
+export const CONTRACT_ID = MARKET_CONTRACT_ID;
 
 export const SOROBAN_RPC_URL =
   process.env.NEXT_PUBLIC_SOROBAN_RPC_URL ?? "https://soroban-testnet.stellar.org";

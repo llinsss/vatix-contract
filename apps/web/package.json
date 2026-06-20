@@ -6,10 +6,12 @@
     "dev": "next dev --port 3002",
     "build": "next build",
     "start": "next start --port 3002",
-    "lint": "tsc --noEmit"
+    "lint": "tsc --noEmit",
+    "build:bindings": "tsx ../../scripts/generate-bindings.ts"
   },
   "dependencies": {
     "@stellar/freighter-api": "^3.1.0",
+    "@stellar/stellar-sdk": "^13.1.0",
     "next": "16.2.1",
     "react": "19.2.4",
     "react-dom": "19.2.4"
